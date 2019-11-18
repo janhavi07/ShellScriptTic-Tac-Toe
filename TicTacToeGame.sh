@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash -x 
 echo "WELCOME TO TIC-TAC-TOE GAME"
 
 #VARIABLES
@@ -39,9 +39,14 @@ function toToss()
 		echo "COMPUTER STARTS THE GAME"
 	fi
 }
+function main()
+{
+	echo "RESETING THE BOARD"
+	echo "PLAYER LETTER is: " $PLAYER_LETTER
+	echo "COMPUTER LETTER is: " $COMPUTER_LETTER
+	toToss
+	echo "****DISPLAYING THE BOARD****"
+	toPrintTheResetBoard
+}
 
-echo "RESETING THE BOARD"
-toPrintTheResetBoard
-echo "PLAYER LETTER is: " $PLAYER_LETTER
-echo "COMPUTER LETTER is: " $COMPUTER_LETTER
-toToss
+main
