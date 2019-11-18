@@ -1,8 +1,10 @@
- #!/bin/bash -x
+#!/bin/bash -x
 echo "WELCOME TO TIC-TAC-TOE GAME"
 
 #VARIABLES
 declare TOTAL_POSITIONS=9
+declare PLAYER_LETTER=X
+declare COMPUTER_LETTER=0
 
 #DICTIONARY DECLARATION
 declare -A boardChart
@@ -26,3 +28,5 @@ function toDisplayBoard()
 }
 echo "RESETING THE BOARD"
 toPrintTheResetBoard
+echo "PLAYER LETTER is: " $PLAYER_LETTER
+echo "COMPUTER LETTER is: " $COMPUTER_LETTER
