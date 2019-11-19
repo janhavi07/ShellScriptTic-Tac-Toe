@@ -1,4 +1,4 @@
-#!/bin/bash -x 
+#!/bin/bash -x
 echo "WELCOME TO TIC-TAC-TOE GAME"
 
 #VARIABLES
@@ -97,28 +97,41 @@ function playingLogic()
 
 function checkDidHeWinOrLoseInRows()
 {
+	setFlag=$FALSE
 	for (( row=1; row<=$TOTAL_POSITIONS; row=$(($row+$NO_OF_ROWS))  ))
 	do
 
 		if [[ ${boardChart[$row]} == ${boardChart[$(($row+1))]} ]] && [[ ${boardChart[$row]} == ${boardChart[$(($row+2))]} ]] && [[ ${boardChart[$row]} != "_" ]]
 		then
-			echo $TRUE
+			setFlag=$TRUE
 			break
 		fi
 	done
-	echo $FALSE
+	if [ $setFlag -eq $TRUE ]
+        then
+                echo $TRUE
+        else
+                echo $FALSE
+        fi
+
 }
 function  checkDidHeWinOrLoseInColumns()
 {
-	for (( column=1; column<=$TOTAL_POSITIONS; column=$(($column+$NO_OF_COLUMNS)) ))
+	setFlag=$FALSE
+	for (( column=1; column<=$NO_OF_COLUMNS; column=$(($column+1))  ))
         do
-                if [[ ${boardChart[$row]} == ${boardChart[$(($row +$NO_OF_ROWS))]} ]] && [[ ${boardChart[$row]} == ${boardChart[$row+$((2*$NO_OF_ROWS))]} ]] && [[ ${boardChart[$row]} != "_" ]] 
+                if [[ ${boardChart[$column]} == ${boardChart[$(($column+$NO_OF_COLUMNS))]} ]] && [[ ${boardChart[$column]} == ${boardChart[$(($column+$((2*$NO_OF_COLUMNS))))]} ]] && [[ ${boardChart[$column]} != "_" ]]
                 then
-                        echo $TRUE
+			setFlag=$TRUE
 			break
                 fi
         done
-	echo $FALSE
+	if [ $setFlag -eq $TRUE ]
+	then
+		echo $TRUE
+	else
+		echo $FALSE
+	fi
 }
 
 function  checkDidHeWinOrLoseInDiagonals()
@@ -126,17 +139,15 @@ function  checkDidHeWinOrLoseInDiagonals()
 	if [[ ${boardChart[1]} ==  ${boardChart[5]} ]] && [[  ${boardChart[1]} ==  ${boardChart[9]} ]] && [[  ${boardChart[1]} != "_" ]]
 	then
 		echo $TRUE
-		break
 	elif [[ ${boardChart[3]} == ${boardChart[5]} ]] && [[ ${boardChart[3]} == ${boardChart[7]} ]] && [[ ${boardChart[3]} != "_" ]]
 	then
 		echo $TRUE
-		break
 	else
 		echo $FALSE
 	fi
 
-
 }
+
 function main()
 {
 	echo "RESETING THE BOARD"
