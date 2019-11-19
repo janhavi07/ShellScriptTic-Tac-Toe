@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash 
 echo "WELCOME TO TIC-TAC-TOE GAME"
 
 #VARIABLES
@@ -10,14 +10,12 @@ declare TAILTOSS=0
 declare letter=0
 declare PLAYER=1
 declare COMPUTER=2
-<<<<<<< HEAD
-=======
 declare TRUE=1
 declare FALSE=0
 declare NO_OF_ROWS=3
 declare NO_OF_COLUMNS=3
 declare toCheckWinLoseVariable=0
->>>>>>> TicTacToeUC5
+
 
 #DICTIONARY DECLARATION
 declare -A boardChart
@@ -92,10 +90,6 @@ function toToss()
 
 function playingLogic()
 {
-<<<<<<< HEAD
-	read -p "Enter the position you want to enter into: " position
-}
-=======
 	playing=$TRUE
 	while [ $playing -eq $TRUE ]
 	do
@@ -169,7 +163,6 @@ function  checkDidHeWinOrLoseInDiagonals()
 
 }
 
->>>>>>> TicTacToeUC5
 function main()
 {
 	echo "RESETING THE BOARD"
