@@ -15,8 +15,8 @@ declare FALSE=0
 declare NO_OF_ROWS=3
 declare NO_OF_COLUMNS=3
 declare toCheckWinLoseVariable=0
-declare winningPositionOfRows=0 
-
+declare winningPositionOfRows=0
+declare oneWhoIsPlaying=0
 #DICTIONARY DECLARATION
 declare -A boardChart
 
@@ -53,20 +53,6 @@ function letterToAssign()
 	fi
 }
 
-function letterToAssign()
-{
-
-	if [ $letter -eq $X_LETTER ]
-        then
-		 COMPUTER="0"
-                 PLAYER="X"
-
-	else
-                PLAYER="0"
-                COMPUTER="X"
-	fi
-}
-
 function toToss()
 {
 	whichLetter=$((RANDOM%2))
@@ -94,13 +80,14 @@ function playingLogic()
 {
 	winningConditionCounter=0
 	playing=$TRUE
+	oneWhoIsPlaying=$PLAYER
 	while [ $playing -eq $TRUE ]
 	do
 		read -p "Enter the position you want to enter into: " position
-		 boardChart[$position]=$COMPUTER
+	 	 boardChart[$position]=$oneWhoIsPlaying
 		((winningConditionCounter++))
 		toDisplayBoard
-		if [ $winningConditionCounter -ge 2 ]
+		if [ $winningConditionCounter -ge 3 ]
                 then
                         winningPositionOfRows=$(toCheckWinningConditionInRows)
                         winningPositionOfColumn=$(toCheckWinningConditionInColumns)
@@ -110,9 +97,9 @@ function playingLogic()
 			boardChart[$winningPositionOfColumn]=$COMPUTER
 			boardChart[$winningPositionOfDiagonal]=$COMPUTER
 			toDisplayBoard
-			echo "COMPUTER WON "
-                        playing=$FALSE
-                        break
+			oneWhoIsPlaying=$COMPUTER
+                        # playing=$FALSE
+                       # break
 
                 fi
 		winningRow=$(checkDidHeWinOrLoseInRows)
@@ -124,9 +111,24 @@ function playingLogic()
 			playing=$FALSE
 			break
 		fi
+		if [ $oneWhoIsPlaying == $PLAYER ]
+		then
+			oneWhoIsPlaying=$COMPUTER
+		else
+			oneWhoIsPlaying=$PLAYER
+		fi
 	done
 }
+function theOnePlaying()
+{
+	if [ $oneWhoIsPlaying == $PLAYER ]
+                then
+                        oneWhoIsPlaying=$COMPUTER
+                else
+                        oneWhoIsPlaying=$PLAYER
+                fi
 
+}
 function checkDidHeWinOrLoseInRows()
 {
 	setFlag=$FALSE
@@ -277,9 +279,11 @@ function toCheckWinningConditionInDiagonals()
 function mainfunction()
 {
 	echo "RESETING THE BOARD"
-	echo "PLAYER LETTER is: " $player
-	echo "COMPUTER LETTER is: " $computer
+#	echo "PLAYER LETTER is: " $PLAYER
+#	echo "COMPUTER LETTER is: " $COMPUTER
 	toToss
+	echo "PLAYER LETTER is: " $PLAYER
+        echo "COMPUTER LETTER is: " $COMPUTER
 	echo "****DISPLAYING THE BOARD****"
 	toPrintTheResetBoard
 	playingLogic
