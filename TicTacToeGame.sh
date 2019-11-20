@@ -18,7 +18,9 @@ declare toCheckWinLoseVariable=0
 declare winningPositionOfRows=0
 declare oneWhoIsPlaying=0
 declare winningPositionOfColumn=0
-declare winningPositionOfDiagonal=0 
+declare winningPositionOfDiagonal=0
+declare MIDDLE_POSITION=5
+declare positionsInCorner=0
 
 #DICTIONARY DECLARATION
 declare -A boardChart
@@ -104,7 +106,12 @@ function playingLogic()
 				boardChart[$winningPositionOfDiagonal]=$COMPUTER
 			else
 				positionsInCorner=$(toCheckAvailableCorners)
-				boardChart[$positionsInCorner]=$COMPUTER
+				if [ $positionsInCorner -eq $FALSE ]
+				then
+					boardChart[$MIDDLE_POSITION]=$COMPUTER
+				else
+					boardChart[$positionsInCorner]=$COMPUTER
+				fi
 			fi
 			toDisplayBoard
 			oneWhoIsPlaying=$COMPUTER
