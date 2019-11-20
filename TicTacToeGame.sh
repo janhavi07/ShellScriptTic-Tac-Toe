@@ -17,6 +17,9 @@ declare NO_OF_COLUMNS=3
 declare toCheckWinLoseVariable=0
 declare winningPositionOfRows=0
 declare oneWhoIsPlaying=0
+declare winningPositionOfColumn=0
+declare winningPositionOfDiagonal=0 
+
 #DICTIONARY DECLARATION
 declare -A boardChart
 
@@ -41,7 +44,6 @@ function toDisplayBoard()
 
 function letterToAssign()
 {
-
 	if [ $letter -eq $X_LETTER ]
         then
 		 COMPUTER="O"
@@ -72,7 +74,6 @@ function toToss()
 	else
 		echo "COMPUTER STARTS THE GAME"
 		letterToAssign
-
 	fi
 }
 
@@ -83,43 +84,43 @@ function playingLogic()
 	oneWhoIsPlaying=$PLAYER
 	while [ $playing -eq $TRUE ]
 	do
-		read -p "Enter the position you want to enter into: " position
-	 	 boardChart[$position]=$oneWhoIsPlaying
+		read -p "Enter the position to enter into: " position
+	 	boardChart[$position]=$oneWhoIsPlaying
 		((winningConditionCounter++))
 		toDisplayBoard
+		echo "............."
 		if [ $winningConditionCounter -ge 3 ]
                 then
                         winningPositionOfRows=$(toCheckWinningConditionInRows)
-                        winningPositionOfColumn=$(toCheckWinningConditionInColumns)
-                        winningPositionOfDiagonal=$(toCheckWinningConditionInDiagonals)
-                        echo "YOU CAN WIN BY PLACING AT " $winningPositionOfRows $winningPositionOfColumn $winningPositionOfDiagonal
-			boardChart[$winningPositionOfRows]=$COMPUTER
-			boardChart[$winningPositionOfColumn]=$COMPUTER
-			boardChart[$winningPositionOfDiagonal]=$COMPUTER
+			winningPositionOfColumn=$(toCheckWinningConditionInColumns)
+			winningPositionOfDiagonal=$(toCheckWinningConditionInDiagonals)
+			if [ $winningPositionOfRows -gt $FALSE ]
+			then
+				boardChart[$winningPositionOfRows]=$COMPUTER
+			elif [ $winningPositionOfColumn -gt $FALSE ]
+			then
+				boardChart[$winningPositionOfColumn]=$COMPUTER
+			elif [ $winningPositionOfDiagonal -gt $FALSE ]
+			then
+				boardChart[$winningPositionOfDiagonal]=$COMPUTER
+			fi
 			toDisplayBoard
 			oneWhoIsPlaying=$COMPUTER
-                        # playing=$FALSE
-                       # break
-
                 fi
 		winningRow=$(checkDidHeWinOrLoseInRows)
 		winningColumn=$(checkDidHeWinOrLoseInColumns)
 		winningDiagonal=$(checkDidHeWinOrLoseInDiagonals)
 		if [ $winningRow -eq $TRUE ] || [ $winningColumn -eq $TRUE ] || [ $winningDiagonal -eq $TRUE ]
 		then
-			echo "COMPUTER WON "
+			echo  "WON "
 			playing=$FALSE
 			break
 		fi
-		if [ $oneWhoIsPlaying == $PLAYER ]
-		then
-			oneWhoIsPlaying=$COMPUTER
-		else
-			oneWhoIsPlaying=$PLAYER
-		fi
+		toCheckTheNextWhoIsPlaying
 	done
 }
-function theOnePlaying()
+
+function toCheckTheNextWhoIsPlaying()
 {
 	if [ $oneWhoIsPlaying == $PLAYER ]
                 then
@@ -129,6 +130,7 @@ function theOnePlaying()
                 fi
 
 }
+
 function checkDidHeWinOrLoseInRows()
 {
 	setFlag=$FALSE
@@ -189,19 +191,19 @@ function toCheckWinningConditionInRows()
 	flag=$FALSE
 	for (( row=1; row<=TOTAL_POSITIONS; row=$(($row+$NO_OF_ROWS)) ))
 	do
-		if [ ${boardChart[$row]} == ${boardChart[$(($row+1))]} ] && [ ${boardChart[$row]} != "_" ]
+		if [ ${boardChart[$row]} == ${boardChart[$(($row+1))]} ] && [ ${boardChart[$row]} != "_" ] && [ ${boardChart[$(($row+2))]} != $COMPUTER ]
 		then
 			flag=$TRUE
 			echoThis=$((row+2))
 			echo $echoThis
 			break
-		elif [ ${boardChart[$row]} == ${boardChart[$(($row+2))]} ] && [ ${boardChart[$(($row+2))]} != "_" ]
+		elif [ ${boardChart[$row]} == ${boardChart[$(($row+2))]} ] && [ ${boardChart[$(($row+2))]} != "_" ] && [ ${boardChart[$(($row+1))]} != $COMPUTER ]
 		then
 			flag=$TRUE
 			echoThis=$(($row+1))
 			echo $echoThis
 			break
-		elif [ ${boardChart[$(($row+2))]} == ${boardChart[$(($row+1))]} ] && [ ${boardChart[$(($row+1))]} != "_" ]
+		elif [ ${boardChart[$(($row+2))]} == ${boardChart[$(($row+1))]} ] && [ ${boardChart[$(($row+1))]} != "_" ] && [ ${boardChart[$row]} != $COMPUTER ]
 		then
 			flag=$TRUE
 			echo $row
@@ -219,19 +221,19 @@ function toCheckWinningConditionInColumns()
 	flag=$FALSE
 	for (( column=1; column<=$NO_OF_COLUMNS; column=$(($column+1)) ))
 	do
-		if [ ${boardChart[$column]} == ${boardChart[$(($column+$NO_OF_COLUMNS))]} ] && [ ${boardChart[$column]} != "_" ]
+		if [ ${boardChart[$column]} == ${boardChart[$(($column+$NO_OF_COLUMNS))]} ] && [ ${boardChart[$column]} != "_" ] && [ ${boardChart[$(($column+$((2*$NO_OF_COLUMNS))))]} != $COMPUTER ]
 		then
 			flag=$TRUE
 			echoThis=$(($column+$((2*$NO_OF_COLUMNS))))
 			echo $echoThis
 			break
-		elif [ ${boardChart[$column]} == ${boardChart[$(($column+$((2*$NO_OF_COLUMNS))))]} ] && [ ${boardChart[$(($column+$((2*$NO_OF_COLUMNS))))]} != "_" ]
+		elif [ ${boardChart[$column]} == ${boardChart[$(($column+$((2*$NO_OF_COLUMNS))))]} ] && [ ${boardChart[$(($column+$((2*$NO_OF_COLUMNS))))]} != "_" ] && [ ${boardChart[$(($column+$NO_OF_COLUMNS))]} != $COMPUTER ]
 		then
 			flag=$TRUE
 			echoThis=$(($column+$NO_OF_COLUMNS))
 			echo $echoThis
 			break
-		elif [ ${boardChart[$(($column+$NO_OF_COLUMNS))]} == ${boardChart[$(($column+$((2*$NO_OF_COLUMNS))))]} ] && [ ${boardChart[$(($column+$((2*$NO_OF_COLUMNS))))]} != "_" ]
+		elif [ ${boardChart[$(($column+$NO_OF_COLUMNS))]} == ${boardChart[$(($column+$((2*$NO_OF_COLUMNS))))]} ] && [ ${boardChart[$(($column+$((2*$NO_OF_COLUMNS))))]} != "_" ] && [ ${boardChart[$column]} != $COMPUTER ]
 		then
 			flag=$TRUE
 			echo $column
@@ -247,27 +249,27 @@ function toCheckWinningConditionInColumns()
 
 function toCheckWinningConditionInDiagonals()
 {
-	if [ ${boardChart[1]} ==  ${boardChart[5]} ] && [ ${boardChart[5]} != "_" ]
+	if [ ${boardChart[1]} ==  ${boardChart[5]} ] && [ ${boardChart[5]} != "_" ] && [ ${boardChart[9]} != $COMPUTER ]
 	then
 		echoThis=9
 		echo $echoThis
-	elif [ ${boardChart[1]} == ${boardChart[9]} ] && [ ${boardChart[9]} != "_" ]
+	elif [ ${boardChart[1]} == ${boardChart[9]} ] && [ ${boardChart[9]} != "_" ] && [ ${boardChart[5]} != $COMPUTER ]
 	then
 		echoThis=5
 		echo $echoThis
-	elif [ ${boardChart[9]} == ${boardChart[5]} ] && [ ${boardChart[9]} != "_" ]
+	elif [ ${boardChart[9]} == ${boardChart[5]} ] && [ ${boardChart[9]} != "_" ] && [ ${boardChart[1]} != $COMPUTER ]
 	then
 		echoThis=1
 		echo $echoThis
-	 elif [ ${boardChart[3]} == ${boardChart[7]} ] && [ ${boardChart[3]} != "_" ] 
+	 elif [ ${boardChart[3]} == ${boardChart[7]} ] && [ ${boardChart[3]} != "_" ] && [ ${boardChart[5]} != $COMPUTER ]
          then
                 echoThis=5
                 echo $echoThis
-	 elif [ ${boardChart[7]} == ${boardChart[5]} ] && [ ${boardChart[5]} != "_" ] 
+	 elif [ ${boardChart[7]} == ${boardChart[5]} ] && [ ${boardChart[5]} != "_" ] && [ ${boardChart[3]} != $COMPUTER ]
          then
                 echoThis=3
                 echo $echoThis
-	 elif [ ${boardChart[3]} == ${boardChart[5]} ] && [ ${boardChart[3]} != "_" ] 
+	 elif [ ${boardChart[3]} == ${boardChart[5]} ] && [ ${boardChart[3]} != "_" ] && [ ${boardChart[7]} != $COMPUTER ]
          then
                 echoThis=7
                 echo $echoThis
@@ -279,14 +281,13 @@ function toCheckWinningConditionInDiagonals()
 function mainfunction()
 {
 	echo "RESETING THE BOARD"
-#	echo "PLAYER LETTER is: " $PLAYER
-#	echo "COMPUTER LETTER is: " $COMPUTER
 	toToss
 	echo "PLAYER LETTER is: " $PLAYER
         echo "COMPUTER LETTER is: " $COMPUTER
 	echo "****DISPLAYING THE BOARD****"
 	toPrintTheResetBoard
 	playingLogic
+	echo "THANKYOU"
 }
 
 mainfunction
