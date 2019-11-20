@@ -24,7 +24,6 @@ declare winningPositionOfDiagonal=0
 declare -A boardChart
 
 
-
 function toPrintTheResetBoard()
 {
 	for(( position=1; position<=$TOTAL_POSITIONS; position++ ))
@@ -103,6 +102,9 @@ function playingLogic()
 			elif [ $winningPositionOfDiagonal -gt $FALSE ]
 			then
 				boardChart[$winningPositionOfDiagonal]=$COMPUTER
+			else
+				positionsInCorner=$(toCheckAvailableCorners)
+				boardChart[$positionsInCorner]=$COMPUTER
 			fi
 			toDisplayBoard
 			oneWhoIsPlaying=$COMPUTER
@@ -191,19 +193,19 @@ function toCheckWinningConditionInRows()
 	flag=$FALSE
 	for (( row=1; row<=TOTAL_POSITIONS; row=$(($row+$NO_OF_ROWS)) ))
 	do
-		if [ ${boardChart[$row]} == ${boardChart[$(($row+1))]} ] && [ ${boardChart[$row]} != "_" ] && [ ${boardChart[$(($row+2))]} != $COMPUTER ]
+		if [ ${boardChart[$row]} == ${boardChart[$(($row+1))]} ] && [ ${boardChart[$row]} != "_" ] && [ ${boardChart[$(($row+2))]} != $COMPUTER ] && [ ${boardChart[$(($row+2))]} != $PLAYER ] 
 		then
 			flag=$TRUE
 			echoThis=$((row+2))
 			echo $echoThis
 			break
-		elif [ ${boardChart[$row]} == ${boardChart[$(($row+2))]} ] && [ ${boardChart[$(($row+2))]} != "_" ] && [ ${boardChart[$(($row+1))]} != $COMPUTER ]
+		elif [ ${boardChart[$row]} == ${boardChart[$(($row+2))]} ] && [ ${boardChart[$(($row+2))]} != "_" ] && [ ${boardChart[$(($row+1))]} != $COMPUTER ] && [ ${boardChart[$(($row+1))]} != $PLAYER ]
 		then
 			flag=$TRUE
 			echoThis=$(($row+1))
 			echo $echoThis
 			break
-		elif [ ${boardChart[$(($row+2))]} == ${boardChart[$(($row+1))]} ] && [ ${boardChart[$(($row+1))]} != "_" ] && [ ${boardChart[$row]} != $COMPUTER ]
+		elif [ ${boardChart[$(($row+2))]} == ${boardChart[$(($row+1))]} ] && [ ${boardChart[$(($row+1))]} != "_" ] && [ ${boardChart[$row]} != $COMPUTER ] && [ ${boardChart[$row]} != $PLAYER ]
 		then
 			flag=$TRUE
 			echo $row
@@ -221,19 +223,19 @@ function toCheckWinningConditionInColumns()
 	flag=$FALSE
 	for (( column=1; column<=$NO_OF_COLUMNS; column=$(($column+1)) ))
 	do
-		if [ ${boardChart[$column]} == ${boardChart[$(($column+$NO_OF_COLUMNS))]} ] && [ ${boardChart[$column]} != "_" ] && [ ${boardChart[$(($column+$((2*$NO_OF_COLUMNS))))]} != $COMPUTER ]
+		if [ ${boardChart[$column]} == ${boardChart[$(($column+$NO_OF_COLUMNS))]} ] && [ ${boardChart[$column]} != "_" ] && [ ${boardChart[$(($column+$((2*$NO_OF_COLUMNS))))]} != $COMPUTER ] && [ ${boardChart[$(($column+$((2*$NO_OF_COLUMNS))))]} != $PLAYER ]
 		then
 			flag=$TRUE
 			echoThis=$(($column+$((2*$NO_OF_COLUMNS))))
 			echo $echoThis
 			break
-		elif [ ${boardChart[$column]} == ${boardChart[$(($column+$((2*$NO_OF_COLUMNS))))]} ] && [ ${boardChart[$(($column+$((2*$NO_OF_COLUMNS))))]} != "_" ] && [ ${boardChart[$(($column+$NO_OF_COLUMNS))]} != $COMPUTER ]
+		elif [ ${boardChart[$column]} == ${boardChart[$(($column+$((2*$NO_OF_COLUMNS))))]} ] && [ ${boardChart[$(($column+$((2*$NO_OF_COLUMNS))))]} != "_" ] && [ ${boardChart[$(($column+$NO_OF_COLUMNS))]} != $COMPUTER ] && [ ${boardChart[$(($column+$NO_OF_COLUMNS))]} != $PLAYER ]
 		then
 			flag=$TRUE
 			echoThis=$(($column+$NO_OF_COLUMNS))
 			echo $echoThis
 			break
-		elif [ ${boardChart[$(($column+$NO_OF_COLUMNS))]} == ${boardChart[$(($column+$((2*$NO_OF_COLUMNS))))]} ] && [ ${boardChart[$(($column+$((2*$NO_OF_COLUMNS))))]} != "_" ] && [ ${boardChart[$column]} != $COMPUTER ]
+		elif [ ${boardChart[$(($column+$NO_OF_COLUMNS))]} == ${boardChart[$(($column+$((2*$NO_OF_COLUMNS))))]} ] && [ ${boardChart[$(($column+$((2*$NO_OF_COLUMNS))))]} != "_" ] && [ ${boardChart[$column]} != $COMPUTER ] && [ ${boardChart[$column]} != $PLAYER ]
 		then
 			flag=$TRUE
 			echo $column
@@ -247,29 +249,51 @@ function toCheckWinningConditionInColumns()
 
 }
 
-function toCheckWinningConditionInDiagonals()
+function toCheckAvailableCorners()
 {
-	if [ ${boardChart[1]} ==  ${boardChart[5]} ] && [ ${boardChart[5]} != "_" ] && [ ${boardChart[9]} != $COMPUTER ]
-	then
-		echoThis=9
-		echo $echoThis
-	elif [ ${boardChart[1]} == ${boardChart[9]} ] && [ ${boardChart[9]} != "_" ] && [ ${boardChart[5]} != $COMPUTER ]
-	then
-		echoThis=5
-		echo $echoThis
-	elif [ ${boardChart[9]} == ${boardChart[5]} ] && [ ${boardChart[9]} != "_" ] && [ ${boardChart[1]} != $COMPUTER ]
+	if [ ${boardChart[1]} == "_" ]
 	then
 		echoThis=1
 		echo $echoThis
-	 elif [ ${boardChart[3]} == ${boardChart[7]} ] && [ ${boardChart[3]} != "_" ] && [ ${boardChart[5]} != $COMPUTER ]
+	elif [ ${boardChart[3]} == "_" ]
+	then
+                echoThis=3
+                echo $echoThis
+	elif [ ${boardChart[7]} == "_" ]
+        then
+                echoThis=7
+                echo $echoThis
+	elif [ ${boardChart[9]} == "_" ]
+        then
+                echoThis=9
+                echo $echoThis
+	fi
+}
+
+
+function toCheckWinningConditionInDiagonals()
+{
+	if [ ${boardChart[1]} ==  ${boardChart[5]} ] && [ ${boardChart[5]} != "_" ] && [ ${boardChart[9]} != $COMPUTER ] && [ ${boardChart[9]} != $PLAYER ]
+	then
+		echoThis=9
+		echo $echoThis
+	elif [ ${boardChart[1]} == ${boardChart[9]} ] && [ ${boardChart[9]} != "_" ] && [ ${boardChart[5]} != $COMPUTER ] && [ ${boardChart[5]} != $PLAYER ]
+	then
+		echoThis=5
+		echo $echoThis
+	elif [ ${boardChart[9]} == ${boardChart[5]} ] && [ ${boardChart[9]} != "_" ] && [ ${boardChart[1]} != $COMPUTER ] && [ ${boardChart[1]} != $PLAYER ]
+	then
+		echoThis=1
+		echo $echoThis
+	 elif [ ${boardChart[3]} == ${boardChart[7]} ] && [ ${boardChart[3]} != "_" ] && [ ${boardChart[5]} != $COMPUTER ] && [ ${boardChart[5]} != $PLAYER ]
          then
                 echoThis=5
                 echo $echoThis
-	 elif [ ${boardChart[7]} == ${boardChart[5]} ] && [ ${boardChart[5]} != "_" ] && [ ${boardChart[3]} != $COMPUTER ]
+	 elif [ ${boardChart[7]} == ${boardChart[5]} ] && [ ${boardChart[5]} != "_" ] && [ ${boardChart[3]} != $COMPUTER ] && [ ${boardChart[3]} != $PLAYER ]
          then
                 echoThis=3
                 echo $echoThis
-	 elif [ ${boardChart[3]} == ${boardChart[5]} ] && [ ${boardChart[3]} != "_" ] && [ ${boardChart[7]} != $COMPUTER ]
+	 elif [ ${boardChart[3]} == ${boardChart[5]} ] && [ ${boardChart[3]} != "_" ] && [ ${boardChart[7]} != $COMPUTER ] && [ ${boardChart[7]} != $PLAYER ]
          then
                 echoThis=7
                 echo $echoThis
