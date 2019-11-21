@@ -21,6 +21,10 @@ declare winningPositionOfColumn=0
 declare winningPositionOfDiagonal=0
 declare MIDDLE_POSITION=5
 declare positionsInCorner=0
+declare positionsInCorner=0
+declare middlePositionLeft=0
+declare sidesLeft=0
+
 
 #DICTIONARY DECLARATION
 declare -A boardChart
@@ -37,6 +41,7 @@ function toPrintTheResetBoard()
 
 function toDisplayBoard()
 {
+	
 	echo "|" ${boardChart[1]} "|" ${boardChart[2]} "|" ${boardChart[3]} "|"
 	echo "|" ${boardChart[4]} "|" ${boardChart[5]} "|" ${boardChart[6]} "|"
 	echo "|" ${boardChart[7]} "|" ${boardChart[8]} "|" ${boardChart[9]} "|"
@@ -105,13 +110,7 @@ function playingLogic()
 			then
 				boardChart[$winningPositionOfDiagonal]=$COMPUTER
 			else
-				positionsInCorner=$(toCheckAvailableCorners)
-				if [ $positionsInCorner -eq $FALSE ]
-				then
-					boardChart[$MIDDLE_POSITION]=$COMPUTER
-				else
-					boardChart[$positionsInCorner]=$COMPUTER
-				fi
+				toCheckSidesCornerMiddlePositions
 			fi
 			toDisplayBoard
 			oneWhoIsPlaying=$COMPUTER
@@ -129,15 +128,34 @@ function playingLogic()
 	done
 }
 
+function toCheckSidesCornerMiddlePositions()
+{
+
+        positionsInCorner=$(toCheckAvailableCorners)
+        sidesLeft=$(toCheckAvailableSides)
+        middlePositionLeft=$(toCheckMiddlePosition)
+        if [ $positionsInCorner -gt $FALSE ]
+        then
+
+                boardChart[$positionsInCorner]=$COMPUTER
+        elif [ $middlePositionLeft -gt $FALSE ]
+        then
+                boardChart[$middlePositionLeft]=$COMPUTER
+        elif [ $sidesLeft -gt $FALSE ]
+        then
+                boardChart[$sidesLeft]=$COMPUTER
+        fi
+}
+
+
 function toCheckTheNextWhoIsPlaying()
 {
 	if [ $oneWhoIsPlaying == $PLAYER ]
-                then
-                        oneWhoIsPlaying=$COMPUTER
-                else
-                        oneWhoIsPlaying=$PLAYER
-                fi
-
+	then
+		oneWhoIsPlaying=$COMPUTER
+	else
+		oneWhoIsPlaying=$PLAYER
+        fi
 }
 
 function checkDidHeWinOrLoseInRows()
@@ -145,7 +163,6 @@ function checkDidHeWinOrLoseInRows()
 	setFlag=$FALSE
 	for (( row=1; row<=$TOTAL_POSITIONS; row=$(($row+$NO_OF_ROWS))  ))
 	do
-
 		if [[ ${boardChart[$row]} == ${boardChart[$(($row+1))]} ]] && [[ ${boardChart[$row]} == ${boardChart[$(($row+2))]} ]] && [[ ${boardChart[$row]} != "_" ]]
 		then
 			setFlag=$TRUE
@@ -258,23 +275,38 @@ function toCheckWinningConditionInColumns()
 
 function toCheckAvailableCorners()
 {
-	if [ ${boardChart[1]} == "_" ]
-	then
-		echoThis=1
-		echo $echoThis
-	elif [ ${boardChart[3]} == "_" ]
-	then
+
+        if [ ${boardChart[1]} == "_" ]
+        then
+                echoThis=1
+                echo $echoThis
+        elif [ ${boardChart[3]} == "_" ]
+        then
                 echoThis=3
                 echo $echoThis
-	elif [ ${boardChart[7]} == "_" ]
+        elif [ ${boardChart[7]} == "_" ]
         then
                 echoThis=7
                 echo $echoThis
-	elif [ ${boardChart[9]} == "_" ]
+        elif [ ${boardChart[9]} == "_" ]
         then
                 echoThis=9
                 echo $echoThis
+	else
+		echoThis=$FALSE
+		echo $echoThis
+        fi
+}
+
+function toCheckMiddlePosition()
+{
+        if [[ $boardChart[$MIDDLE_POSITON] == "_" ]]
+	then
+		echo $MIDDLE_POSITION
+	else
+		echo $FALSE
 	fi
+
 }
 
 
@@ -292,21 +324,44 @@ function toCheckWinningConditionInDiagonals()
 	then
 		echoThis=1
 		echo $echoThis
-	 elif [ ${boardChart[3]} == ${boardChart[7]} ] && [ ${boardChart[3]} != "_" ] && [ ${boardChart[5]} != $COMPUTER ] && [ ${boardChart[5]} != $PLAYER ]
-         then
+	elif [ ${boardChart[3]} == ${boardChart[7]} ] && [ ${boardChart[3]} != "_" ] && [ ${boardChart[5]} != $COMPUTER ] && [ ${boardChart[5]} != $PLAYER ]
+        then
                 echoThis=5
                 echo $echoThis
-	 elif [ ${boardChart[7]} == ${boardChart[5]} ] && [ ${boardChart[5]} != "_" ] && [ ${boardChart[3]} != $COMPUTER ] && [ ${boardChart[3]} != $PLAYER ]
-         then
+	elif [ ${boardChart[7]} == ${boardChart[5]} ] && [ ${boardChart[5]} != "_" ] && [ ${boardChart[3]} != $COMPUTER ] && [ ${boardChart[3]} != $PLAYER ]
+        then
                 echoThis=3
                 echo $echoThis
-	 elif [ ${boardChart[3]} == ${boardChart[5]} ] && [ ${boardChart[3]} != "_" ] && [ ${boardChart[7]} != $COMPUTER ] && [ ${boardChart[7]} != $PLAYER ]
-         then
+	elif [ ${boardChart[3]} == ${boardChart[5]} ] && [ ${boardChart[3]} != "_" ] && [ ${boardChart[7]} != $COMPUTER ] && [ ${boardChart[7]} != $PLAYER ]
+        then
                 echoThis=7
                 echo $echoThis
-	 else
+	else
 		echo $FALSE
-	 fi
+	fi
+}
+
+function toCheckAvailableSides()
+{
+        if [ ${boardChart[2]} == "_" ]
+        then
+                echoThis=2
+                echo $echoThis
+        elif [ ${boardChart[6]} == "_" ]
+        then
+                echoThis=6
+                echo $echoThis
+        elif [ ${boardChart[4]} == "_" ]
+        then
+                echoThis=4
+                echo $echoThis
+        elif [ ${boardChart[8]} == "_" ]
+        then
+                echoThis=8
+                echo $echoThis
+        else
+                echo $FALSE
+        fi
 }
 
 function mainfunction()
