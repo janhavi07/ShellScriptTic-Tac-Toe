@@ -7,14 +7,25 @@ declare X_LETTER=1
 declare ZERO_LETTER=0
 declare HEADTOSS=1
 declare TAILTOSS=0
+declare letter=0
 declare PLAYER=1
 declare COMPUTER=2
 declare TRUE=1
 declare FALSE=0
 declare NO_OF_ROWS=3
 declare NO_OF_COLUMNS=3
+declare toCheckWinLoseVariable=0
+declare winningPositionOfRows=0
+declare oneWhoIsPlaying=0
+#declare winningPositionOfColumn=0
+#declare winningPositionOfDiagonal=0
 declare MIDDLE_POSITION=5
-declare NO_OF_TIMES_AFTER_WHICH_COMPUTER_WILL_PLAY_ITSELF=3
+#declare positionsInCorner=0
+#declare positionsInCorner=0
+#declare middlePositionLeft=0
+
+#declare sidesLeft=0
+declare noPositionLeft=0
 
 #DICTIONARY DECLARATION
 declare -A boardChart
@@ -53,7 +64,6 @@ function letterToAssign()
 
 function toToss()
 {
-	local letter=0
 	whichLetter=$((RANDOM%2))
         if [[ $whichLetter -eq $X_LETTER ]]
         then
@@ -76,98 +86,63 @@ function toToss()
 
 function playingLogic()
 {
-	local blockingConditionCounter=0
-	local positionsOccupiedCounter=0
-	local noPosition=0
+	winningConditionCounter=0
 	playing=$TRUE
 	oneWhoIsPlaying=$PLAYER
 	while [ $playing -eq $TRUE ]
 	do
 		read -p "Enter the position to enter into: " position
 	 	boardChart[$position]=$oneWhoIsPlaying
-		((blockingConditionCounter++))
+		((winningConditionCounter++))
 		toDisplayBoard
 		echo "............."
-		if [ $blockingConditionCounter -ge $NO_OF_TIMES_AFTER_WHICH_COMPUTER_WILL_PLAY_ITSELF ]
+		if [ $winningConditionCounter -ge 3 ]
                 then
-			((positionsOccupiedCounter++))
-                        echo $positionsOccupiedCounter
-                        toBlockPlayerFromWinning
+                        local blockingPositionInRows=$(toCheckWinningConditionInRows)
+			local blockingPositionInColumn=$(toCheckWinningConditionInColumns)
+			local blockingPositionInDiagonal=$(toCheckWinningConditionInDiagonals)
+			if [ $winningPositionOfRows -ne $noPositionLeft ]
+			then
+				boardChart[$winningPositionOfRows]=$COMPUTER
+			elif [ $winningPositionOfColumn -ne $noPositionLeft ]
+			then
+				boardChart[$winningPositionOfColumn]=$COMPUTER
+			elif [ $winningPositionOfDiagonal -ne $noPositionLeft ]
+			then
+				boardChart[$winningPositionOfDiagonal]=$COMPUTER
+			else
+				toCheckSidesCornerMiddlePositions
+			fi
+			toDisplayBoard
+			oneWhoIsPlaying=$COMPUTER
                 fi
-		toCheckHasAnyOneWonTheGame
+		winningRow=$(checkDidHeWinOrLoseInRows)
+		winningColumn=$(checkDidHeWinOrLoseInColumns)
+		winningDiagonal=$(checkDidHeWinOrLoseInDiagonals)
+		if [ $winningRow -eq $TRUE ] || [ $winningColumn -eq $TRUE ] || [ $winningDiagonal -eq $TRUE ]
+		then
+			echo  "WON "
+			playing=$FALSE
+			break
+		fi
 		toCheckTheNextWhoIsPlaying
 	done
 }
 
-function toCheckHasAnyOneWonTheGame()
-{
-	local winningRow=$(checkDidHeWinOrLoseInRows)
-        local winningColumn=$(checkDidHeWinOrLoseInColumns)
-        local winningDiagonal=$(checkDidHeWinOrLoseInDiagonals)
-	((positionsOccupiedCounter++))
-         echo $positionsOccupiedCounter
-
-        if [ $winningRow -eq $TRUE ]
-        then
-        	echo  "WON "
-        	playing=$FALSE
-        	break
-        elif [ $winningColumn -eq $TRUE ] 
-        then
-        	echo  "WON "
-        	playing=$FALSE
-        	break
-        elif [ $winningDiagonal -eq $TRUE ]
-        then
-        	echo  "WON "
-        	playing=$FALSE
-        	break
-        elif [ $positionsOccupiedCounter -eq $TOTAL_POSITIONS ]
-        then
-        	echo "DRAWS THE GAME"
-		playing=$FALSE
-        	break
-        fi
-
-
-}
-
-function toBlockPlayerFromWinning()
-{
-	 local blockingPositionInRows=$(toCheckBlockingConditionInRows)
-         local blockingPositionInColumn=$(toCheckBlockingConditionInColumns)
-         local blockingPositionInDiagonal=$(toCheckBlockingConditionInDiagonals)
-         if [ $blockingPositionInRows -ne $noPosition ]
-         then
-         	boardChart[$blockingPositionInRows]=$COMPUTER
-         elif [ $blockingPositionInColumn -ne $noPosition ]
-         then
-         	boardChart[$blockingPositionInColumn]=$COMPUTER
-         elif [ $blockingPositionInDiagonal -ne $noPosition ]
-         then
-         	boardChart[$blockingPositionInDiagonal]=$COMPUTER
-         else
-         	toCheckSidesCornerMiddlePositions
-         fi
-         toDisplayBoard
-         oneWhoIsPlaying=$COMPUTER
-
-
-}
-
 function toCheckSidesCornerMiddlePositions()
 {
-        local positionsInCorner=$(toCheckAvailableCorners)
-        local sidesLeft=$(toCheckAvailableSides)
-        local middlePositionLeft=$(toCheckMiddlePosition)
-        if [ $positionsInCorner -ne $noPosition ]
+
+        positionsInCorner=$(toCheckAvailableCorners)
+        sidesLeft=$(toCheckAvailableSides)
+        middlePositionLeft=$(toCheckMiddlePosition)
+        if [ $positionsInCorner -ne $noPositionLeft ]
         then
 
                 boardChart[$positionsInCorner]=$COMPUTER
-        elif [ $middlePositionLeft -ne $noPosition ]
+        elif [ $middlePositionLeft -ne $noPositionLeft ]
         then
                 boardChart[$middlePositionLeft]=$COMPUTER
-        elif [ $sidesLeft -ne $noPosition ]
+        elif [ $sidesLeft -ne $noPositionLeft ]
         then
                 boardChart[$sidesLeft]=$COMPUTER
         fi
@@ -238,7 +213,7 @@ function  checkDidHeWinOrLoseInDiagonals()
 }
 
 
-function toCheckBlockingConditionInRows()
+function toCheckWinningConditionInRows()
 {
 	flag=$FALSE
 	for (( row=1; row<=TOTAL_POSITIONS; row=$(($row+$NO_OF_ROWS)) ))
@@ -268,7 +243,7 @@ function toCheckBlockingConditionInRows()
 	fi
 }
 
-function toCheckBlockingConditionInColumns()
+function toCheckWinningConditionInColumns()
 {
 	flag=$FALSE
 	for (( column=1; column<=$NO_OF_COLUMNS; column=$(($column+1)) ))
@@ -336,7 +311,7 @@ function toCheckMiddlePosition()
 }
 
 
-function toCheckBlockingConditionInDiagonals()
+function toCheckWinningConditionInDiagonals()
 {
 	if [ ${boardChart[1]} ==  ${boardChart[5]} ] && [ ${boardChart[5]} != "_" ] && [ ${boardChart[9]} != $COMPUTER ] && [ ${boardChart[9]} != $PLAYER ]
 	then
